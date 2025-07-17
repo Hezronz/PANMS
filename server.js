@@ -4,6 +4,9 @@ const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const loginHandler = require('./api/login');
+const signupHandler = require('./api/signup');
+
+
 
 const app = express();
 const PORT = 3000;
@@ -22,6 +25,7 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/api/login', loginHandler); // Connects your login.js file
+app.post('/api/signup', signupHandler);
 
 app.get('/api/getStatus', (req, res) => {
   res.json({ status: "Project pending approval" }); // Example placeholder
