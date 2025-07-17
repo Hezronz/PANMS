@@ -15,7 +15,8 @@ app.use(express.static(path.join(__dirname, 'frontend')));
 // Send login page at root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'student-login.html'));
-
+}
+        
 app.use(cors());
 app.use(express.json());
 
