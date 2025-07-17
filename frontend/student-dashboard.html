@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard | PANMS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome, Student!</h2>
+    
+    <!-- Project Submission Section -->
+    <section>
+      <h3>Upload Project Files</h3>
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input type="text" name="projectTitle" placeholder="Project Title" required />
+        <input type="file" name="projectFiles" multiple required />
+        <button type="submit">Submit Project</button>
+      </form>
+    </section>
+
+    <!-- Approval Status Section -->
+    <section>
+      <h3>Project Status</h3>
+      <div id="statusDisplay">
+        <p>Loading project status...</p>
+      </div>
+    </section>
+
+    <!-- Feedback Section -->
+    <section>
+      <h3>Comments & Feedback</h3>
+      <div id="feedbackContainer">
+        <p>Loading feedback...</p>
+      </div>
+    </section>
+
+    <div class="link-back">
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+   <section class="projects">
+    <h3>My Submitted Projects</h3>
+    <div id="myProjects"></div>
+  </section>
+
+  <script>
+  async function loadStatus() {
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      alert("Please log in again.");
+      window.location.href = "login-student.html";
+      return;
+    }
+
+    const res = await fetch(`http://localhost:3000/api/status/${studentId}`);
+    const data = await res.json();
+
+    document.getElementById('statusDisplay').innerHTML = `
+      <p><strong>Title:</strong> ${data.title || 'N/A'}</p>
+      <p><strong>Status:</strong> ${data.status}</p>
+    `;
+
+    document.getElementById('feedbackContainer').innerHTML = `
+      <ul>
+        <li><strong>HOD:</strong> ${data.hodFeedback || 'No feedback yet'}</li>
+        <li><strong>Project In-Charge:</strong> ${data.inchargeFeedback || 'No feedback yet'}</li>
+        <li><strong>Guide:</strong> ${data.guideFeedback || 'No feedback yet'}</li>
+      </ul>
+    `;
+  }
+
+  async function loadMyProjects() {
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      alert("Please log in again.");
+      window.location.href = "login-student.html";
+      return;
+    }
+
+    const res = await fetch(`http://localhost:3000/api/myprojects/${studentId}`);
+    const projects = await res.json();
+    const container = document.getElementById('myProjects');
+    container.innerHTML = '';
+
+    if (projects.length === 0) {
+      container.textContent = "No projects submitted yet.";
+      return;
+    }
+
+    projects.forEach(p => {
+      const fileLinks = p.report
+        .split(',')
+        .map(file => `<a href="http://localhost:3000/uploads/${file.trim()}" target="_blank">📄</a>`)
+        .join(' ');
+
+      container.insertAdjacentHTML('beforeend', `
+        <div class="project-card">
+          <h4>${p.title}</h4>
+          <p>Status: ${p.status}</p>
+          <p>Files: ${fileLinks}</p>
+        </div>
+      `);
+    });
+  }
+
+  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      alert("Please log in again.");
+      window.location.href = "login-student.html";
+      return;
+    }
+
+    formData.append('student', studentId);
+
+    const res = await fetch('http://localhost:3000/api/submitProject', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await res.json();
+    alert(result.message || "Upload completed.");
+    loadStatus();
+    loadMyProjects();
+  });
+
+  function logout() {
+    localStorage.removeItem('studentId');
+    alert("Logging out...");
+    window.location.href = "login-student.html";
+  }
+
+  // Initial load
+  loadStatus();
+  loadMyProjects();
+</script>
+
+</body>
+</html>

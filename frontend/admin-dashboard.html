@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin Dashboard | PANMS</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="admin-container">
+    <h2>PANMS – Admin Panel</h2>
+
+    <section>
+      <h3>Pending Project Submissions</h3>
+      <table id="projectTable">
+        <thead><tr><th>ID</th><th>Title</th><th>Student</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    // fetch pending projects from backend
+    async function loadPending(){
+      const res = await fetch('http://localhost:3000/api/projects/pending');
+      const rows= await res.json();
+      const tbody=document.querySelector('#projectTable tbody');
+      tbody.innerHTML='';
+      
+      rows.forEach(p => {
+  const fileLinks = p.report
+    .split(',')
+    .map(file => `<a href="http://localhost:3000/uploads/${file.trim()}" target="_blank">📄</a>`)
+    .join(' ');
+
+  tbody.insertAdjacentHTML('beforeend', `
+    <tr>
+      <td>${p.id}</td>
+      <td>${p.title}</td>
+      <td>${p.student}</td>
+      <td>${p.status}</td>
+      <td>
+        ${fileLinks}<br/>
+        <button onclick="approve(${p.id})">✓</button>
+        <button onclick="reject(${p.id})">✗</button>
+      </td>
+    </tr>`);
+});
+
+    }
+    async function approve(id){
+      await fetch(`http://localhost:3000/api/projects/${id}/approve`,{method:'POST'});
+      loadPending();
+    }
+    async function reject(id){
+      const comment = prompt("Reason for rejection:");
+      if(!comment) return;
+      await fetch(`http://localhost:3000/api/projects/${id}/reject`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({comment})
+      });
+      loadPending();
+    }
+    loadPending();
+  </script>
+</body>
+</html>
