@@ -22,7 +22,7 @@
   <script>
     // fetch pending projects from backend
     async function loadPending(){
-      const res = await fetch('http://localhost:3000/api/projects/pending');
+      const res = await fetch('https://panms-1.onrender.com/api/projects/pending');
       const rows= await res.json();
       const tbody=document.querySelector('#projectTable tbody');
       tbody.innerHTML='';
@@ -30,7 +30,7 @@
       rows.forEach(p => {
   const fileLinks = p.report
     .split(',')
-    .map(file => `<a href="http://localhost:3000/uploads/${file.trim()}" target="_blank">📄</a>`)
+    .map(file => `<a href="https://panms-1.onrender.com/uploads/${file.trim()}" target="_blank">📄</a>`)
     .join(' ');
 
   tbody.insertAdjacentHTML('beforeend', `
@@ -49,13 +49,13 @@
 
     }
     async function approve(id){
-      await fetch(`http://localhost:3000/api/projects/${id}/approve`,{method:'POST'});
+      await fetch(`https://panms-1.onrender.com/api/projects/${id}/approve`,{method:'POST'});
       loadPending();
     }
     async function reject(id){
       const comment = prompt("Reason for rejection:");
       if(!comment) return;
-      await fetch(`http://localhost:3000/api/projects/${id}/reject`,{
+      await fetch(`https://panms-1.onrender.com/api/projects/${id}/reject`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({comment})

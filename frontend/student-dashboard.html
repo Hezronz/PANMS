@@ -55,7 +55,7 @@
       return;
     }
 
-    const res = await fetch(`http://localhost:3000/api/status/${studentId}`);
+    const res = await fetch(`https://panms-1.onrender.com/api/status/${studentId}`);
     const data = await res.json();
 
     document.getElementById('statusDisplay').innerHTML = `
@@ -80,7 +80,7 @@
       return;
     }
 
-    const res = await fetch(`http://localhost:3000/api/myprojects/${studentId}`);
+    const res = await fetch(`https://panms-1.onrender.com/api/myprojects/${studentId}`);
     const projects = await res.json();
     const container = document.getElementById('myProjects');
     container.innerHTML = '';
@@ -93,7 +93,7 @@
     projects.forEach(p => {
       const fileLinks = p.report
         .split(',')
-        .map(file => `<a href="http://localhost:3000/uploads/${file.trim()}" target="_blank">📄</a>`)
+        .map(file => `<a href="https://panms-1.onrender.com/uploads/${file.trim()}" target="_blank">📄</a>`)
         .join(' ');
 
       container.insertAdjacentHTML('beforeend', `
@@ -119,7 +119,7 @@
 
     formData.append('student', studentId);
 
-    const res = await fetch('http://localhost:3000/api/submitProject', {
+    const res = await fetch('https://panms-1.onrender.com/api/submitProject', {
       method: 'POST',
       body: formData
     });

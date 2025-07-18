@@ -9,7 +9,7 @@ const signupHandler = require('./api/signup');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Serve files from 'frontend' folder instead
@@ -147,5 +147,10 @@ app.post('/api/submitProject', upload.array('projectFiles'), async (req, res) =>
 
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  if (process.env.PORT) {
+    console.log(`Server running on Render, port ${PORT}`);
+  } else {
+    console.log(`Server running locally at http://localhost:${PORT}`);
+  }
 });
+
