@@ -19,11 +19,13 @@ module.exports = async (req, res) => {
       [name, email, hashedPassword]
     );
 
-    // ✅ Return success and student ID
-    res.status(201).json({
-      success: true,
-      studentId: result.insertId
-    });
+    const studentId = result.insertId; // ← ✅ Get inserted student ID
+
+    res.status(201).json({ 
+      message: "Signup successful!", 
+      success: true, 
+      studentId 
+    }); // ← ✅ Send full response
   } catch (err) {
     console.error("Signup error:", err);
     res.status(500).json({ message: "Internal server error" });
